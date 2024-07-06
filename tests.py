@@ -20,7 +20,7 @@ class TestMainProcess(unittest.TestCase):
         mock_calc_instance = MockCalculations.return_value
         mock_plot_instance = MockPlot.return_value
 
-        # Mock the return values for CSV data retrieval
+        # Mock the return values for CSV data retrieval.
         df_train = pd.DataFrame({'X': [1, 2], 'Y1 (training func)': [3, 4]})
         df_ideal = pd.DataFrame({'X': [1, 2], 'Y1 (ideal func)': [3, 4]})
         df_test = pd.DataFrame({'X (test func)': [1, 2], 'Y (test func)': [3, 4]})
