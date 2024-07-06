@@ -5,6 +5,7 @@ from plotting import Plot
 
 class MainProcess:
     def __init__(self, host, database_name, username, password, port, tables, dataset_path, file_names, file_to_table_map):
+        # Initialize the class with database connection details, table definitions, dataset path, file names, and file to table mapping
         self.host = host
         self.database_name = database_name
         self.username = username
@@ -17,7 +18,6 @@ class MainProcess:
 
     def run(self):
         # Step 1: Create the database and tables
-        
         db_instance = DataBase(self.host, self.database_name, self.username, self.password, self.port, self.tables)
         db_instance.create_database()
         db_instance.create_tables()
@@ -34,31 +34,51 @@ class MainProcess:
 
         # Step 4: Perform calculations
         calc_instance = Calculations(df_train, df_ideal, df_test)
-        ssd_sums = calc_instance.calc_ssd_sums()
-        calc_instance.calc_deviations()
-        test_results = calc_instance.get_test_results()
+        ssd_sums = calc_instance.calc_ssd_sums()  # Calculate the sum of squared differences
+        calc_instance.calc_deviations()  # Calculate deviations
+        test_results = calc_instance.get_test_results()  # Get the test results
 
         # Step 5: Plot results
         plot_instance = Plot(ssd_sums, test_results)
-        plot_instance.plotting()
+        plot_instance.plotting()  # Generate and display plots
 
 if __name__ == "__main__":
+    # Database connection details
     host = '127.0.0.1'
     database_name = 'py_db'
     username = 'root'
     password = 'root'
     port = 3306
 
+    # Table definitions
     tables = {
-        "train_functions": [('X', 'FLOAT'), ('Y1 (training func)', 'FLOAT'), ('Y2 (training func)', 'FLOAT'), ('Y3 (training func)', 'FLOAT'), ('Y4 (training func)', 'FLOAT')],
-        "test_functions": [('X (test func)', 'FLOAT'), ('Y (test func)', 'FLOAT'), ('Delta Y (test func)', 'FLOAT'), ('No. of ideal func', 'VARCHAR(255)')],
-        "ideal_functions": [('X', 'FLOAT')] + [(f'Y{i} (ideal func)', 'FLOAT') for i in range(1, 51)],
+        "train_functions": [
+            ('X', 'FLOAT'), 
+            ('Y1 (training func)', 'FLOAT'), 
+            ('Y2 (training func)', 'FLOAT'), 
+            ('Y3 (training func)', 'FLOAT'), 
+            ('Y4 (training func)', 'FLOAT')
+        ],
+        "test_functions": [
+            ('X (test func)', 'FLOAT'), 
+            ('Y (test func)', 'FLOAT'), 
+            ('Delta Y (test func)', 'FLOAT'), 
+            ('No. of ideal func', 'VARCHAR(255)')
+        ],
+        "ideal_functions": [
+            ('X', 'FLOAT')
+        ] + [(f'Y{i} (ideal func)', 'FLOAT') for i in range(1, 51)]
     }
 
+    # File names and dataset path
     file_names = ['train.csv', 'test.csv', 'ideal.csv']
     dataset_path = './Csv files/'
-    file_to_table_map = {'train.csv': 'train_functions', 'test.csv': 'test_functions', 'ideal.csv': 'ideal_functions'}
+    file_to_table_map = {
+        'train.csv': 'train_functions', 
+        'test.csv': 'test_functions', 
+        'ideal.csv': 'ideal_functions'
+    }
 
+    # Initialize and run the main process
     main_process = MainProcess(host, database_name, username, password, port, tables, dataset_path, file_names, file_to_table_map)
     main_process.run()
-

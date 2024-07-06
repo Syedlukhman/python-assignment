@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import MagicMock, patch
 import pandas as pd
-from index import MainProcess  # Assuming the class is in a file named main_process.py
+from index import MainProcess  # Assuming the class is in a file named index.py
 from db import DataBase
 from process_csv import ProcessCsv
 from calculation import Calculations
@@ -25,6 +25,7 @@ class TestMainProcess(unittest.TestCase):
         df_ideal = pd.DataFrame({'X': [1, 2], 'Y1 (ideal func)': [3, 4]})
         df_test = pd.DataFrame({'X (test func)': [1, 2], 'Y (test func)': [3, 4]})
 
+        # Mocking the get_csv_data method to return the appropriate DataFrame based on the table name
         mock_csv_instance.get_csv_data.side_effect = lambda table_name: {
             'train_functions': df_train,
             'ideal_functions': df_ideal,
@@ -54,8 +55,22 @@ class TestMainProcess(unittest.TestCase):
         dataset_path = './Csv files/'
         file_to_table_map = {'train.csv': 'train_functions', 'test.csv': 'test_functions', 'ideal.csv': 'ideal_functions'}
 
+        # Create an instance of MainProcess
         main_process = MainProcess(host, database_name, username, password, port, tables, dataset_path, file_names, file_to_table_map)
+        
+        # Run the main process
         main_process.run()
+        
+        # Validate that the methods are called as expected
+        mock_db_instance.create_database.assert_called_once()
+        mock_db_instance.create_tables.assert_called_once()
+        mock_db_instance.close_connection.assert_called_once()
+        mock_csv_instance.insert_csv_data.assert_called_once()
+        self.assertEqual(mock_csv_instance.get_csv_data.call_count, 3)
+        mock_calc_instance.calc_ssd_sums.assert_called_once()
+        mock_calc_instance.calc_deviations.assert_called_once()
+        mock_calc_instance.get_test_results.assert_called_once()
+        mock_plot_instance.plotting.assert_called_once()
 
 if __name__ == '__main__':
     unittest.main()
